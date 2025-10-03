@@ -10,6 +10,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 import re
+from dotenv import load_dotenv
+load_dotenv()
+
 
 
 app = FastAPI(title="NASA PMC Publications API", version="1.2.0")
@@ -24,6 +27,9 @@ app.add_middleware(
 )
 
 publications_db = {}
+
+from qurobot_api import router as qurobot_router
+app.include_router(qurobot_router)
 
 @app.on_event("startup")
 def load_data():
@@ -441,6 +447,11 @@ def get_pdf_info(pmcid: str):
         "download_timestamp": publication.get("download_timestamp"),
         "pdf_error": publication.get("pdf_error") if not publication.get("pdf_downloaded") else None
     }
+
+
+
+
+
 
 if __name__ == "__main__":
     import uvicorn

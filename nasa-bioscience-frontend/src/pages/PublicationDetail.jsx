@@ -4,7 +4,7 @@ import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../services/api";
 import BulkBar from "../components/BulkBar";
 import { collectPdfLinks, openPdfLinks } from "../utils/pdfLinks";
-
+import Search from "../pages/Search";
 /**
  * PublicationDetail
  *
