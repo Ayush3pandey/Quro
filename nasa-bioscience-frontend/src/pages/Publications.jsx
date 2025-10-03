@@ -341,7 +341,6 @@
 
 
 
-
 // src/pages/Publications.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -416,7 +415,6 @@ const Publications = () => {
   );
 
   // Initial fetch and re-sync when URL or state changes.
-  // We also update component category when URL or Link state changes so component remains synced.
   useEffect(() => {
     const urlCategory = new URLSearchParams(location.search).get("category");
     const stateCategory = location.state && location.state.category ? location.state.category : null;
@@ -436,34 +434,6 @@ const Publications = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search, location.state]); // run when URL query or Link state changes
-
-  // Explicit search / filter triggered by user
-  const performSearch = async (pageToFetch = 1) => {
-    setLoading(true);
-    try {
-      const payload = {
-        query: query?.trim() || undefined,
-        search_fields: searchFields,
-        page: pageToFetch,
-        per_page: perPage
-      };
-      if (category) payload.category = category;
-
-      const data = await api.filterPublications(payload);
-      setResults(data.publications || []);
-      setTotalResults(data.total || 0);
-      setTotalPages(data.total_pages || 0);
-      setPage(pageToFetch);
-      setSelectedMap({});
-    } catch (err) {
-      console.error("Search failed:", err);
-      setResults([]);
-      setTotalResults(0);
-      setTotalPages(0);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Clear category: remove query param from URL and update component state & refetch
   const clearCategory = () => {
@@ -506,8 +476,21 @@ const Publications = () => {
     if (p < 1) p = 1;
     if (p > totalPages) p = totalPages;
     // If there's an active query (user search) use performSearch; else general fetch
-    if (query && query.trim().length > 0) performSearch(p);
-    else fetchPublicationsPayload(p);
+    if (query && query.trim().length > 0) {
+      // This logic is kept simple: call the API filter path for searching
+      fetchPublicationsPayload(p, { query: query.trim(), search_fields: searchFields, per_page: perPage });
+    } else fetchPublicationsPayload(p);
+  };
+
+  // Handler that Search (embedded) will call with its results
+  const handleSearchResults = (data) => {
+    // data = { publications, total, total_pages, page }
+    setResults(data.publications || []);
+    setTotalResults(data.total || 0);
+    setTotalPages(data.total_pages || 0);
+    setPage(data.page || 1);
+    setSelectedMap({});
+    setLoading(false);
   };
 
   return (
@@ -523,31 +506,24 @@ const Publications = () => {
 
           <div className="flex items-center gap-3">
             {category && (
-              // now clearCategory actually removes the query param and refetches
               <button onClick={clearCategory} className="text-sm text-gray-600 underline">
                 Using category: {category} (click to clear)
               </button>
             )}
             <Link to="/search" className="px-3 py-2 border rounded text-sm text-gray-700 hover:bg-gray-50">
-              Advanced Search
+              Advanced Search (full page)
             </Link>
           </div>
         </div>
 
-        {/* Compact search bar */}
-<div className="bg-white rounded-lg shadow p-4 mb-6">
-<Search
-// props you should pass from Publications page state/controllers
-query={query}
-setQuery={setQuery}
-searchFields={searchFields}
-setSearchFields={setSearchFields}
-onSearch={(page) => performSearch(page)}
-loading={loading}
-// If your Search component expects other props (filters, handlers), pass them here
-// e.g. filters, setFilters, onClearFilters, categories, etc.
-/>
-</div>
+        {/* --- EMBEDDED ADVANCED SEARCH (same UI/behaviour as /search) --- */}
+        <div className="mb-6">
+          <Search
+            embed={true}
+            initialCategory={category}
+            onResults={(data) => handleSearchResults(data)}
+          />
+        </div>
 
         {/* Results grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

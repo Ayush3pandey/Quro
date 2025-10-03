@@ -7,7 +7,7 @@ const Navigation = () => {
   const navItems = [
     { path: "/", label: "Research Overview", icon: "" },
     { path: "/publications", label: "Publications", icon: "" },
-    { path: "/search", label: "Advanced Search", icon: "" },
+    { path: "/chatbot", label: "Advanced Search", icon: "" },
     { path: "/analytics", label: "Impact Analytics", icon: "" },
   ];
 
