@@ -61,7 +61,8 @@ if _bot_module is None:
                 _bot_module = mod
                 _bot_module_name = fname
                 break
-            except Exception:
+            except Exception as e:
+                logger.error(f"Failed to load {fname}: {e}")
                 _bot_module = None
 
 if _bot_module is None:
@@ -141,29 +142,36 @@ def _call_handler(text: str, context: Optional[dict] = None) -> Dict[str, Any]:
             result = _handler(text, context or {})
         else:
             result = _handler(text)
-        # normalize response types
+        
+        # Handle ChatbotResponse object (from UnifiedResearchChatbot.query)
+        if hasattr(result, "answer") and hasattr(result, "sources"):
+            reply = getattr(result, "answer", "")
+            sources = getattr(result, "sources", [])
+            method = getattr(result, "method", "unknown")
+            mode = getattr(result, "mode", "unknown")
+            
+            return {
+                "reply": str(reply), 
+                "meta": {
+                    "success": True,
+                    "sources": sources,
+                    "method": method,
+                    "mode": mode
+                }
+            }
+        
+        # normalize response types for other formats
         if isinstance(result, dict):
             reply = result.get("reply") or result.get("text") or str(result)
             meta = result.get("meta", {"success": True})
-            # If the UnifiedResearchChatbot.query returned a ChatbotResponse object, try to extract
-            # common attributes. (This is defensive: user's class may return objects)
-            if hasattr(result, "answer") and hasattr(result, "sources"):
-                # unlikely, but keep safe
-                reply = getattr(result, "answer")
-                meta = {"success": True}
             return {"reply": reply, "meta": meta}
         else:
-            # If object has 'answer' attribute (ChatbotResponse), extract it
-            if hasattr(result, "answer"):
-                reply_text = getattr(result, "answer")
-                meta = {"success": True}
-                return {"reply": str(reply_text), "meta": meta}
             # otherwise stringify
             return {"reply": str(result), "meta": {"success": True}}
     except Exception as e:
         tb = traceback.format_exc()
         logger.exception("Error while calling QuroBot handler")
-        return {"reply": "", "meta": {"success": False, "error": str(e), "traceback": tb}}
+        return {"reply": f"Error processing query: {str(e)}", "meta": {"success": False, "error": str(e), "traceback": tb}}
 
 # ---------- Router endpoints ----------
 @router.get("/ping")

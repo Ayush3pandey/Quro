@@ -23,8 +23,9 @@ PyPDF2==3.0.1
 pdfplumber==0.10.3
 
 # --- RAG / embeddings / vector DB ---
-sentence-transformers==2.2.2
+sentence-transformers>=2.7.0
 qdrant-client==1.7.0
+huggingface-hub>=0.20.0
 
 # --- Google Gemini client ---
 google-genai==0.3.0

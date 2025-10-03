@@ -30,7 +30,7 @@ export default function ResearchAssistantPage() {
 
   async function fetchPapers() {
     try {
-      const res = await fetch("/papers?page=1&per_page=10");
+      const res = await fetch("http://127.0.0.1:8000/papers?page=1&per_page=10");
       const data = await res.json();
       setPapers(data.publications || []);
     } catch (e) {
@@ -40,7 +40,7 @@ export default function ResearchAssistantPage() {
 
   async function fetchStats() {
     try {
-      const res = await fetch("/stats");
+      const res = await fetch("http://127.0.0.1:8000/stats");
       const data = await res.json();
       setStats(data);
     } catch (e) {
@@ -57,18 +57,28 @@ export default function ResearchAssistantPage() {
 
     try {
       const payload = { text: query };
-      const res = await fetch("/api/qurobot/query", {
+      console.log("Sending request with payload:", payload);
+      const res = await fetch("http://127.0.0.1:8000/api/qurobot/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
+      console.log("Response status:", res.status);
+      console.log("Response ok:", res.ok);
+
       if (!res.ok) {
         const err = await res.json();
+        console.error("API Error:", err);
         throw new Error(err.detail || "Query failed");
       }
 
       const data = await res.json();
+      
+      // Debug logging
+      console.log("API Response:", data);
+      console.log("Reply text:", data.reply);
+      console.log("Meta:", data.meta);
 
       // qurobot_api returns { reply: string, meta: {...} }
       const assistantText = data.reply || "(no reply)";
@@ -77,6 +87,7 @@ export default function ResearchAssistantPage() {
       const sources = data.meta?.sources || [];
 
       const assistantMsg = { role: "assistant", text: assistantText, sources };
+      console.log("Assistant message:", assistantMsg);
       setMessages((m) => [...m, assistantMsg]);
     } catch (e) {
       console.error(e);
@@ -111,7 +122,7 @@ export default function ResearchAssistantPage() {
       setPdfPath(serverPath || "");
 
       // tell qurobot to switch to pdf mode by uploading path
-      const up = await fetch("/api/qurobot/upload_pdf", {
+      const up = await fetch("http://127.0.0.1:8000/api/qurobot/upload_pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pdf_path: serverPath }),

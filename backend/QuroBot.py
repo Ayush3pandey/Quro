@@ -210,12 +210,12 @@ class QdrantRetriever:
         try:
             query_embedding = self.generate_embedding(query)
             
-            search_results = self.client.query_points(
+            search_results = self.client.search(
                 collection_name=self.collection_name,
-                query=query_embedding,
+                query_vector=query_embedding,
                 limit=limit,
                 score_threshold=score_threshold
-            ).points
+            )
             
             chunks = []
             total_score = 0.0
