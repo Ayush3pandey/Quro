@@ -1,0 +1,192 @@
+{
+  "schema_version": "1.0.0",
+  "description": "NASA Bioscience Publications Database Schema",
+  "created_at": "2025-09-30T17:15:00Z",
+  "total_publications": 608,
+  "publication_structure": {
+    "pmid": {
+      "type": "string",
+      "description": "PubMed ID - primary key",
+      "example": "12345678",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "description": "Publication title",
+      "example": "Effects of Microgravity on Plant Growth",
+      "required": true
+    },
+    "authors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of authors",
+      "example": ["Smith J", "Lee P"],
+      "required": true
+    },
+    "year": {
+      "type": "integer",
+      "description": "Publication year",
+      "example": 2021,
+      "minimum": 1950,
+      "maximum": 2030,
+      "required": true
+    },
+    "journal": {
+      "type": "string",
+      "description": "Journal name",
+      "example": "Space Biology Journal",
+      "required": true
+    },
+    "abstract": {
+      "type": "string",
+      "description": "Publication abstract",
+      "example": "This study explores...",
+      "required": true
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "plant biology",
+          "microbiology",
+          "space biology",
+          "astrobiology",
+          "microgravity",
+          "gravitational biology",
+          "radiation biology",
+          "cell biology",
+          "molecular biology",
+          "physiology",
+          "genetics",
+          "biochemistry",
+          "neuroscience",
+          "cardiovascular",
+          "bone biology",
+          "muscle biology",
+          "immunology",
+          "general biology"
+        ]
+      },
+      "description": "Publication categories based on MeSH terms",
+      "example": ["plant biology"],
+      "required": true
+    },
+    "pdf_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to PubMed page",
+      "example": "https://pubmed.ncbi.nlm.nih.gov/12345678/",
+      "required": true
+    },
+    "doi": {
+      "type": "string",
+      "description": "Digital Object Identifier",
+      "example": "10.1038/nature12345",
+      "required": false
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Author-provided keywords",
+      "example": ["microgravity", "plant growth"],
+      "required": false
+    },
+    "publication_type": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Type of publication",
+      "example": ["Journal Article"],
+      "required": false
+    },
+    "pdf_downloaded": {
+      "type": "boolean",
+      "description": "Whether PDF was successfully downloaded",
+      "example": true,
+      "required": true
+    },
+    "pdf_file_path": {
+      "type": "string",
+      "description": "Local path to downloaded PDF",
+      "example": "pdfs/12345678.pdf",
+      "required": false
+    },
+    "pdf_file_size": {
+      "type": "integer",
+      "description": "PDF file size in bytes",
+      "example": 1048576,
+      "required": false
+    },
+    "download_source": {
+      "type": "string",
+      "description": "Source from which PDF was downloaded",
+      "example": "PMC_OA",
+      "enum": ["PMC_OA", "PMC_Author", "PubMed_Free", "Institution", "Direct_Link"],
+      "required": false
+    }
+  },
+  "file_structure": {
+    "json_database": {
+      "file": "publications.json",
+      "description": "Main database file with all publication metadata"
+    },
+    "pdf_directory": {
+      "directory": "pdfs/",
+      "description": "Directory containing all downloaded PDF files",
+      "naming_convention": "{pmid}.pdf"
+    },
+    "logs_directory": {
+      "directory": "logs/",
+      "description": "Directory containing processing and download logs"
+    }
+  },
+  "api_endpoints": {
+    "base_url": "http://localhost:8000",
+    "endpoints": [
+      {
+        "path": "/",
+        "method": "GET",
+        "description": "Health check and API info"
+      },
+      {
+        "path": "/papers",
+        "method": "GET",
+        "description": "Get all papers with pagination",
+        "parameters": ["page", "per_page", "sort_by", "sort_order"]
+      },
+      {
+        "path": "/paper/{pmid}",
+        "method": "GET",
+        "description": "Get single paper by PMID"
+      },
+      {
+        "path": "/search",
+        "method": "GET",
+        "description": "Search papers by query",
+        "parameters": ["query", "page", "per_page", "search_fields"]
+      },
+      {
+        "path": "/filter",
+        "method": "GET",
+        "description": "Filter papers by criteria",
+        "parameters": ["category", "journal", "year", "author", "page", "per_page"]
+      },
+      {
+        "path": "/download/pdf/{pmid}",
+        "method": "GET",
+        "description": "Download PDF file for specific PMID"
+      },
+      {
+        "path": "/stats",
+        "method": "GET",
+        "description": "Get database statistics"
+      }
+    ]
+  }
+}

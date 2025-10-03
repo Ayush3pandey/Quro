@@ -1,0 +1,61 @@
+# Ignore Node modules
+node_modules/
+frontend/node_modules/
+
+
+# === General ===
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+.env
+.env.local
+.env.*.local
+
+# === Node / Frontend ===
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.turbo/
+frontend/.parcel-cache/
+frontend/.vite/
+
+# lock files (optional, if you don’t want them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# === Python / Backend ===
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/.Python
+backend/env/
+backend/venv/
+backend/.venv/
+backend/ENV/
+backend/env.bak/
+backend/venv.bak/
+
+# === Backend specific ===
+backend/logs/
+backend/temp/
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.coverage
+backend/coverage.xml
+backend/.hypothesis/
+
+# === VS Code / IDEs ===
+.vscode/
+.idea/
+*.iml
+
+# === OS specific ===
+*.bak
+*.orig

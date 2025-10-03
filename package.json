@@ -1,0 +1,20 @@
+{
+  "name": "quro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "npx concurrently \"npm:frontend:start\" \"npm:backend:start\" --names \"FRONTEND,BACKEND\" --prefix \"[{name}]\"",
+    "frontend:start": "cd nasa-bioscience-frontend && npm install && npm start",
+    "backend:start": "cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
+
+
+
+
+
