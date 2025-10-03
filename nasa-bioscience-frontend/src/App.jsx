@@ -6,7 +6,7 @@ import "./index.css";
 import Navigation from "./components/Navigation";
 import Dashboard from "./pages/Dashboard";
 import Publications from "./pages/Publications";
-import Search from "./pages/Search";
+import ChatBot from "./pages/ChatBot";
 import Analytics from "./pages/Analytics";
 import PublicationDetail from "./pages/PublicationDetail";
 import Moon from './pages/Moon';
@@ -24,7 +24,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/publications" element={<Publications />} />
-            <Route path="/search" element={<Search />} />
+            <Route path="/chatbot" element={<ChatBot />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/publication/:pmcid" element={<PublicationDetail />} />
             <Route path="/moon" element={<Moon />} />
