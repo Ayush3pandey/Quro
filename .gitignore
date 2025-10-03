@@ -30,6 +30,7 @@ frontend/.vite/
 # pnpm-lock.yaml
 
 # === Python / Backend ===
+venv/
 backend/__pycache__/
 backend/*.pyc
 backend/*.pyo
