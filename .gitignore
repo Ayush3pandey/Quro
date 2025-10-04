@@ -10,7 +10,6 @@ Thumbs.db
 *.tmp
 *.swp
 *.swo
-.env
 .env.local
 .env.*.local
 

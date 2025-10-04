@@ -98,65 +98,56 @@ const Dashboard = () => {
   aria-label="Planetary Bioscience Hubs"
 >
   <style>{`
-    /* Center the resizer vertically within the section and make tabs larger.
-       - overall: the card area is centered and limited to a max width.
-       - initial sizes more pronounced: one much smaller, one much larger.
-       - on hover the hovered card expands substantially to give a long-length feel.
-    */
-
-    /* ensure the section's internal container uses most of the viewport height so centering looks natural */
+    /* 4-card grid layout similar to the Featured News design */
     .h-center-wrap {
-      min-height: calc( (100vh - 160px) ); /* makes the cards centered in the middle area; adjust if your header/footer differ */
+      min-height: calc(100vh - 160px);
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 2rem 0;
     }
 
-    .resizer {
-      display: flex;
-      gap: 2rem; /* same visual gap as tailwind's gap-8 */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 1.5rem;
       width: 90%;
-      max-width: 1200px; /* make tabs larger but constrained */
-      transition: all 500ms ease;
-      align-items: stretch;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
-    .res-card {
-      flex: 1;
-      min-width: 0;
-      transition: flex 550ms cubic-bezier(.2,.8,.2,1), transform 550ms cubic-bezier(.2,.8,.2,1);
-      transform-origin: center;
-      will-change: transform, flex;
+    /* Make first card span 2 rows */
+    .hub-card.featured {
+      grid-row: span 2;
     }
 
-    /* Larger card sizing — make overall tabs larger in height */
-    .res-card { height: 520px; } /* increased height */
-
-    /* initial sizes (more extreme) */
-    .res-card.moon { flex: 0.6; }  /* initially noticeably smaller */
-    .res-card.mars { flex: 1.4; }  /* initially noticeably larger */
-
-    /* when hovering the container, shrink all a bit to emphasize expansion on the hovered one */
-    .resizer:hover .res-card { flex: 0.6; }
-
-    /* hovered card expands a lot to look like a long horizontal tab */
-    .resizer .res-card:hover { flex: 1.8; transform: translateY(-12px); }
-
-    /* keep background images smooth */
-    .res-card .bg-cover { will-change: transform; }
-
-    /* keyboard accessibility: focus should mirror hover */
-    .resizer .res-card:focus-within,
-    .resizer .res-card:focus {
-      outline: none;
-      flex: 1.8;
+    .hub-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      transition: all 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      min-height: 300px;
     }
 
-    /* Round corners scale nicely */
-    .res-card .rounded-3xl { overflow: hidden; }
+    .hub-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
 
-    /* Make inner gradient overlay subtler on white background */
+    .hub-card .bg-image {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .hub-card:hover .bg-image {
+      transform: scale(1.1);
+    }
+
     .bottom-fade {
       position: absolute;
       bottom: 0;
@@ -166,10 +157,21 @@ const Dashboard = () => {
       background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
       pointer-events: none;
     }
+
+    @media (max-width: 768px) {
+      .hub-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      
+      .hub-card.featured {
+        grid-row: span 1;
+      }
+    }
   `}</style>
 
-  <div className="absolute top-20 left-1/4 w-96 h-96  rounded-full blur-3xl animate-pulse"></div>
-  <div className="absolute top-1/3 right-1/4 w-96 h-96  rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+  <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full blur-3xl animate-pulse"></div>
+  <div className="absolute top-1/3 right-1/4 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
   <div className="absolute bottom-1/4 left-1/3 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
 
   <div className="max-w-7xl mx-auto relative z-10 flex flex-col h-full">
@@ -177,111 +179,157 @@ const Dashboard = () => {
       <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
         Planetary Bioscience Hubs
       </h2>
-      <div className="w-32 h-1  mx-auto"></div>
+      <div className="w-32 h-1 mx-auto"></div>
     </div>
 
-    {/* Centering wrapper so the tabs sit in the middle of the page area */}
+    {/* 4-card grid layout */}
     <div className="h-center-wrap">
-      {/* Use the resizer class for the flex behavior handled by the CSS above */}
-      <div className="resizer">
-        {/* Moon Hub (initially smaller) */}
+      <div className="hub-grid">
+        {/* Moon Hub - Featured (spans 2 rows) */}
         <Link
           to="/moon"
-          className="res-card group relative block overflow-hidden transition-all duration-500 transform rounded-3xl shadow-2xl moon"
+          className="hub-card featured group"
           tabIndex={0}
           aria-label="Moon Bioscience Hub"
         >
           <div
-            className="absolute inset-0 bg-cover bg-center transform group-hover:scale-110 transition-transform duration-700"
+            className="bg-image"
             style={{ backgroundImage: 'url(/images/moon.jpeg)' }}
           ></div>
 
           <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-gray-900/70 to-black/60"></div>
 
-          <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 
-                          "></div>
-
-          <div className="absolute inset-0 rounded-3xl border-2 "></div>
-
-          <div className="relative z-10 p-8 flex flex-col justify-between h-full">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-2xl mb-4 
-                             group-hover:text-blue-100 transition-all duration-500">
-                Moon Bioscience Hub
-              </h2>
-              <p className="text-gray-100 text-lg leading-relaxed font-medium drop-shadow-lg group-hover:text-white transition-colors duration-300">
-                Curated research and analytics relevant to lunar exploration and biology.
-              </p>
-
-              <div className="mt-6">
-                <span className="text-5xl md:text-6xl font-extrabold text-white drop-shadow-2xl
-                                 group-hover:text-green-300 transition-all duration-500">
-                  {moonCount.toLocaleString()}
-                </span>
-                <span className="text-lg text-blue-200 ml-3 font-semibold drop-shadow-lg">
-                  publications (approx.)
-                </span>
-              </div>
+          <div className="relative z-10 p-6 md:p-8 flex flex-col justify-end h-full">
+            <div className="mb-3">
+              <span className="inline-block px-3 py-1 bg-blue-500/80 rounded-full text-xs font-semibold text-white uppercase tracking-wide">
+                5 MIN READ
+              </span>
             </div>
+            
+            <h3 className="text-2xl md:text-4xl font-bold text-white mb-3 group-hover:text-blue-100 transition-colors duration-300">
+              Moon Bioscience Hub
+            </h3>
+            
+            <p className="text-gray-200 text-base md:text-lg mb-4">
+              Curated research and analytics relevant to lunar exploration and biology.
+            </p>
 
-            <div className="flex items-center justify-between mt-6">
-              <span className="text-lg text-gray-100 font-medium drop-shadow-lg">
-                Explore lunar bioscience publications
+            <div className="mb-4">
+              <span className="text-4xl md:text-5xl font-extrabold text-white">
+                {moonCount.toLocaleString()}
               </span>
-              <span className="text-xl font-bold text-blue-300 drop-shadow-lg group-hover:translate-x-3">
-                Go to Moon →
-              </span>
+              <span className="text-sm text-blue-200 ml-2">publications</span>
             </div>
           </div>
         </Link>
 
-        {/* Mars Hub (initially larger) */}
+        {/* Mars Hub */}
         <Link
           to="/mars"
-          className="res-card group relative block overflow-hidden transition-all duration-500 transform rounded-3xl shadow-2xl mars"
+          className="hub-card group"
           tabIndex={0}
           aria-label="Mars Bioscience Hub"
         >
           <div
-            className="absolute inset-0 bg-cover bg-center transform group-hover:scale-110 transition-transform duration-700"
+            className="bg-image"
             style={{ backgroundImage: 'url(/images/mars1.jpeg)' }}
           ></div>
 
           <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-gray-900/70 to-black/60"></div>
 
-          <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 
-                          "></div>
-
-          <div className="absolute inset-0 rounded-3xl border-2  
-                          "></div>
-
-          <div className="relative z-10 p-8 flex flex-col justify-between h-full">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-2xl mb-4 
-                             group-hover:text-red-100 transition-all duration-500">
-                Mars Bioscience Hub
-              </h2>
-              <p className="text-gray-100 text-lg leading-relaxed font-medium drop-shadow-lg group-hover:text-white transition-colors duration-300">
-                Curated research and analytics focused on Mars-relevant biological studies.
-              </p>
-
-              <div className="mt-6">
-                <span className="text-5xl md:text-6xl font-extrabold text-white drop-shadow-2xl
-                                ">
-                  {marsCount.toLocaleString()}
-                </span>
-                <span className="text-lg text-red-200 ml-3 font-semibold drop-shadow-lg">
-                  publications (approx.)
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between mt-6">
-              <span className="text-lg text-gray-100 font-medium drop-shadow-lg">
-                Explore Mars bioscience publications
+          <div className="relative z-10 p-6 flex flex-col justify-end h-full">
+            <div className="mb-2">
+              <span className="inline-block px-3 py-1 bg-red-500/80 rounded-full text-xs font-semibold text-white uppercase tracking-wide">
+                4 MIN READ
               </span>
-              <span className="text-xl font-bold text-red-300 drop-shadow-lg group-hover:translate-x-3">
-                Go to Mars →
+            </div>
+            
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-red-100 transition-colors duration-300">
+              Mars Bioscience Hub
+            </h3>
+            
+            <p className="text-gray-200 text-sm mb-3">
+              Research focused on Mars-relevant biological studies.
+            </p>
+
+            <div>
+              <span className="text-3xl font-extrabold text-white">
+                {marsCount.toLocaleString()}
+              </span>
+              <span className="text-xs text-red-200 ml-2">publications</span>
+            </div>
+          </div>
+        </Link>
+
+        {/* Knowledge Graph */}
+        <Link
+          to="/analytics"
+          className="hub-card group"
+          tabIndex={0}
+          aria-label="Knowledge Graph"
+        >
+          <div
+            className="bg-image"
+            style={{ backgroundImage: 'url(/images/knowledgeGraph.jpeg)' }}
+          ></div>
+
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/70 via-indigo-900/70 to-black/70"></div>
+
+          <div className="relative z-10 p-6 flex flex-col justify-end h-full">
+            <div className="mb-2">
+              <span className="inline-block px-3 py-1 bg-purple-500/80 rounded-full text-xs font-semibold text-white uppercase tracking-wide">
+                3 MIN READ
+              </span>
+            </div>
+            
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-purple-100 transition-colors duration-300">
+              Knowledge Graph
+            </h3>
+            
+            <p className="text-gray-200 text-sm mb-3">
+              Explore interconnected research concepts and relationships.
+            </p>
+
+            <div>
+              <span className="text-sm text-purple-200 font-semibold">
+                Discover Connections →
+              </span>
+            </div>
+          </div>
+        </Link>
+
+        {/* Research Assistant */}
+        <Link
+          to="/chatbot"
+          className="hub-card group"
+          tabIndex={0}
+          aria-label="Research Assistant"
+        >
+          <div
+            className="bg-image"
+            style={{ backgroundImage: 'url(/images/research.jpeg)' }}
+          ></div>
+
+          <div className="absolute inset-0 "></div>
+
+          <div className="relative z-10 p-6 flex flex-col justify-end h-full">
+            <div className="mb-2">
+              <span className="inline-block px-3 py-1 bg-emerald-500/80 rounded-full text-xs font-semibold text-white uppercase tracking-wide">
+                AI POWERED
+              </span>
+            </div>
+            
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-emerald-100 transition-colors duration-300">
+              Research Assistant
+            </h3>
+            
+            <p className="text-gray-200 text-sm mb-3">
+              AI-powered tool to help navigate and analyze research.
+            </p>
+
+            <div>
+              <span className="text-sm text-emerald-200 font-semibold">
+                Get Started →
               </span>
             </div>
           </div>
