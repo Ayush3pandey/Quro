@@ -32,7 +32,7 @@ QDRANT_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.tnOMOdM
 
 COLLECTION_NAME="research_papers"
 SERP_API_KEY ="9f76f4c571130c56e879920970315ed75379cc2f41fbbc2d287b105163cf873d"
-GEMINI_API_KEY = "AIzaSyDlV6U3s8DYiwl7UI8I0R-vebYKTLtWqdU"
+GEMINI_API_KEY = "AIzaSyADv9H3-LqDDFxepp01o-JBL9jRlOADUag"
 
 
 # RAG Configuration
@@ -186,13 +186,13 @@ class PDFProcessor:
 # ==================== Qdrant Retriever (for RAG mode) ====================
 class QdrantRetriever:
     """Handles retrieval from Qdrant Cloud vector database"""
-    
+
     def __init__(self, client: QdrantClient, collection_name: str, embedding_model: SentenceTransformer):
         self.client = client
         self.collection_name = collection_name
         self.embedding_model = embedding_model
         logger.info(f"Initialized QdrantRetriever for collection: {collection_name}")
-    
+
     def generate_embedding(self, text: str) -> List[float]:
         """Generate embedding using SentenceTransformer"""
         try:
@@ -201,42 +201,68 @@ class QdrantRetriever:
         except Exception as e:
             logger.error(f"Error generating embedding: {e}")
             raise
-    
-    def retrieve(self, query: str, limit: int = RETRIEVAL_LIMIT, 
+
+    def retrieve(self, query: str, limit: int = RETRIEVAL_LIMIT,
                 score_threshold: float = RELEVANCE_THRESHOLD) -> Tuple[List[RetrievedChunk], float]:
-        """Retrieve relevant chunks from Qdrant Cloud"""
-        logger.info(f"Retrieving chunks for query: {query[:100]}...")
-        
+        """Retrieve relevant chunks from Qdrant Cloud (compat: query_points or legacy search)"""
+        logger.info(f"Retrieving chunks for query: {query}...")
+
         try:
             query_embedding = self.generate_embedding(query)
-            
-            search_results = self.client.search(
-                collection_name=self.collection_name,
-                query_vector=query_embedding,
-                limit=limit,
-                score_threshold=score_threshold
-            )
-            
+
+            results = []
+            # Try modern query_points first (newer qdrant-client)
+            try:
+                resp = self.client.query_points(
+                    collection_name=self.collection_name,
+                    query=query_embedding,
+                    limit=limit,
+                    score_threshold=score_threshold
+                )
+                results = getattr(resp, "points", resp) or []
+            except Exception as e_qp:
+                logger.info("query_points failed or not available, falling back to legacy search(): %s", e_qp)
+                # Fallback to older `search` method signature (varies across versions)
+                try:
+                    results = self.client.search(
+                        collection_name=self.collection_name,
+                        query_vector=query_embedding,
+                        limit=limit,
+                        score_threshold=score_threshold
+                    ) or []
+                except Exception as e_search:
+                    logger.error("Legacy search fallback failed: %s", e_search)
+                    results = []
+
             chunks = []
             total_score = 0.0
-            
-            for result in search_results:
-                text_content = result.payload.get("chunk_text", "")
-                
+
+            for res in results:
+                # tolerate both object-like and dict-like results
+                payload = getattr(res, "payload", None) or (res.get("payload") if isinstance(res, dict) else {})
+                text_content = ""
+                if isinstance(payload, dict):
+                    text_content = payload.get("chunk_text") or payload.get("text") or ""
+                else:
+                    text_content = ""
+
+                point_id = getattr(res, "id", None) or (res.get("id") if isinstance(res, dict) else None)
+                score = getattr(res, "score", None) or (res.get("score") if isinstance(res, dict) else 0.0)
+
                 chunk = RetrievedChunk(
-                    id=str(result.id),
+                    id=str(point_id) if point_id is not None else "",
                     text=text_content,
-                    score=result.score,
-                    metadata=result.payload
+                    score=float(score or 0.0),
+                    metadata=payload if isinstance(payload, dict) else {}
                 )
                 chunks.append(chunk)
-                total_score += result.score
-            
+                total_score += float(score or 0.0)
+
             avg_score = total_score / len(chunks) if chunks else 0.0
             logger.info(f"Retrieved {len(chunks)} chunks with avg score: {avg_score:.3f}")
-            
+
             return chunks, avg_score
-            
+
         except Exception as e:
             logger.error(f"Error retrieving from Qdrant: {e}")
             return [], 0.0
@@ -405,6 +431,7 @@ CRITICAL INSTRUCTIONS:
 - If the paper provides information, give a detailed answer
 - If information is incomplete or missing, state: "INSUFFICIENT: The paper does not provide complete information about this."
 - Be specific about what is and isn't covered
+- If something isn't covered in the given context analyse the context thoroughly to give a logicaal answer 
 
 Answer (paraphrased synthesis):"""
         
@@ -499,6 +526,7 @@ CITATION RULES:
 - Cite after EVERY claim
 - Paraphrase all information
 - Provide comprehensive, well-structured answer
+- If something isn't covered in the given context analyse the context thoroughly to give a logicaal answer
 
 Synthesized Answer with Citations:"""
         
@@ -675,13 +703,13 @@ class UnifiedResearchChatbot:
         )
         
         # Assess sufficiency
-        context_preview = "\n".join([chunk.text[:200] for chunk in chunks[:3]])
+        context_preview = "\n".join([chunk.text for chunk in chunks])
         assessment = self.gemini_agent.assess_information_sufficiency(
             user_query, context_preview, answer
         )
         
         needs_external = (
-            not assessment.get("is_sufficient", True) or
+            not assessment.get("is_sufficient", True) and
             avg_score < INSUFFICIENT_SCORE_THRESHOLD
         )
         

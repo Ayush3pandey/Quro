@@ -7,6 +7,7 @@ import api from "../services/api";
  * Reusable PlanetPage component
  * - Search removed
  * - Sorting removed (always shows newest first from backend)
+ * - Fully responsive design
  */
 export default function PlanetPage({ planetName }) {
   const [searchFields] = useState("title,abstract");
@@ -194,44 +195,35 @@ export default function PlanetPage({ planetName }) {
   const totalText = useMemo(() => (total || 0).toLocaleString(), [total]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-3xl font-bold">{planetName} Bioscience Hub</h1>
-          <p className="text-gray-600 mt-1">
+        <header className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold">{planetName} Bioscience Hub</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             Curated research and analytics about biological experiments relevant to {planetName}.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="col-span-2 bg-white rounded-lg p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 sm:mb-6">
+          <div className="lg:col-span-2 bg-white rounded-lg p-3 sm:p-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3">
               <div>
-                <h3 className="text-lg font-semibold">{planetName} Publications</h3>
-                <div className="text-sm text-gray-600">Total (matching): {totalText}</div>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  className="px-3 py-1 border rounded text-sm"
-                  onClick={() => window.alert("RAG summary is not yet implemented — placeholder.")}
-                >
-                  Generate Knowledge Snapshot
-                </button>
+                <h3 className="text-base sm:text-lg font-semibold">{planetName} Publications</h3>
+                <div className="text-xs sm:text-sm text-gray-600">Total (matching): {totalText}</div>
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <div>
-                <div className="text-sm text-gray-500">Top categories</div>
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1">
+                <div className="text-xs sm:text-sm text-gray-500">Top categories</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {statsLoading ? (
-                    <div className="text-sm text-gray-500">Loading…</div>
+                    <div className="text-xs sm:text-sm text-gray-500">Loading…</div>
                   ) : topCategories.length ? (
                     topCategories.map((c) => (
                       <button
                         key={c.name}
-                        className="text-xs bg-gray-100 px-2 py-1 rounded"
+                        className="text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200"
                         onClick={() => {
                           setSelectedCategory(c.name);
                           fetchPublications({ p: 1 });
@@ -241,18 +233,18 @@ export default function PlanetPage({ planetName }) {
                       </button>
                     ))
                   ) : (
-                    <div className="text-sm text-gray-500">No categories found</div>
+                    <div className="text-xs sm:text-sm text-gray-500">No categories found</div>
                   )}
                 </div>
               </div>
 
-              <div className="ml-auto text-sm text-gray-500">
+              <div className="text-xs sm:text-sm text-gray-500">
                 <div>Timeline (sample)</div>
                 <div className="mt-2">
                   {statsLoading ? (
                     <div>Loading…</div>
                   ) : timeline.length ? (
-                    <div className="text-xs text-gray-600">{timeline.map((t) => `${t.year}:${t.count}`).join(" • ")}</div>
+                    <div className="text-xs text-gray-600 break-words">{timeline.map((t) => `${t.year}:${t.count}`).join(" • ")}</div>
                   ) : (
                     <div className="text-xs text-gray-600">No timeline data</div>
                   )}
@@ -260,28 +252,18 @@ export default function PlanetPage({ planetName }) {
               </div>
             </div>
           </div>
-
-          <aside className="bg-white rounded-lg p-4 shadow-sm">
-            <div className="font-semibold mb-2">Knowledge Snapshot</div>
-            <p className="text-sm text-gray-600 mb-3">Short AI summaries and gap analyses will appear here when RAG is available.</p>
-            <div className="text-sm">
-              <button className="px-3 py-1 border rounded text-sm" disabled>
-                Request snapshot (coming)
-              </button>
-            </div>
-          </aside>
         </div>
 
         {/* FILTER BAR (search removed, only filters) */}
-        <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
-          <div className="flex flex-wrap gap-3 items-center">
+        <div className="bg-white rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center">
             <select
               value={selectedCategory}
               onChange={(e) => {
                 setSelectedCategory(e.target.value);
                 fetchPublications({ p: 1 });
               }}
-              className="px-3 py-2 border rounded"
+              className="px-3 py-2 border rounded text-sm w-full sm:w-auto"
             >
               <option value="">All categories</option>
               {categories.map((c) => (
@@ -291,7 +273,7 @@ export default function PlanetPage({ planetName }) {
               ))}
             </select>
 
-            <label className="text-sm flex items-center gap-2">
+            <label className="text-xs sm:text-sm flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={hasPdfOnly}
@@ -305,65 +287,65 @@ export default function PlanetPage({ planetName }) {
 
             <button
               type="button"
-              className="px-3 py-1 border rounded text-sm"
+              className="px-3 py-1 border rounded text-xs sm:text-sm"
               onClick={clearFilters}
             >
               Clear filters
             </button>
 
-            <div className="ml-auto">
+            <div className="sm:ml-auto w-full sm:w-auto">
               <button
                 onClick={exportResultsCsv}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+                className="px-3 py-1 bg-blue-600 text-white rounded text-xs sm:text-sm w-full sm:w-auto"
               >
                 Export page CSV
               </button>
             </div>
           </div>
 
-          <div className="mt-3 text-sm text-gray-500">
+          <div className="mt-3 text-xs sm:text-sm text-gray-500">
             Showing publications for <strong>{planetName}</strong>.
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {loading ? (
-            <div className="col-span-full text-center py-12 text-gray-600">
+            <div className="col-span-full text-center py-12 text-gray-600 text-sm">
               Loading publications…
             </div>
           ) : results.length === 0 ? (
-            <div className="col-span-full text-center py-12 text-gray-600">
+            <div className="col-span-full text-center py-12 text-gray-600 text-sm">
               No publications found for this query.
             </div>
           ) : (
             results.map((pub) => (
               <article
                 key={pub.pmcid || pub.pmid || pub.title}
-                className="bg-white p-4 rounded-lg shadow-sm"
+                className="bg-white p-3 sm:p-4 rounded-lg shadow-sm flex flex-col"
               >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-semibold text-md">{pub.title}</h4>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm sm:text-md break-words">{pub.title}</h4>
                     <div className="text-xs text-gray-500 mt-1">
                       {pub.journal} • {pub.year}
                     </div>
                   </div>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-gray-400 flex-shrink-0">
                     {pub.pmcid || pub.pmid}
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-700 mt-3 line-clamp-3">
+                <p className="text-xs sm:text-sm text-gray-700 mt-3 line-clamp-3">
                   {pub.abstract ? pub.abstract : "No abstract available."}
                 </p>
 
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
+                <div className="mt-4 flex flex-col gap-3">
+                  <div className="text-xs sm:text-sm text-gray-600">
                     {pub.authors?.slice(0, 2).join(", ")}
                     {pub.authors?.length > 2 && " et al."}
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
                     <a
                       href={
                         pub.source_url ||
@@ -371,15 +353,15 @@ export default function PlanetPage({ planetName }) {
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-blue-600 underline"
+                      className="text-blue-600 underline"
                     >
-                      View Full Page
+                      View Full
                     </a>
 
                     <Link
                       to={`/publication/${pub.pmcid || pub.pmid}`}
                       state={{ category: planetName }}
-                      className="text-sm text-gray-600"
+                      className="text-gray-600"
                     >
                       Details
                     </Link>
@@ -389,9 +371,9 @@ export default function PlanetPage({ planetName }) {
                         onClick={() =>
                           handleDownloadPdf(pub.pmcid || pub.pmid)
                         }
-                        className="text-sm px-2 py-1 border rounded"
+                        className="px-2 py-1 border rounded"
                       >
-                        Download PDF
+                        PDF
                       </button>
                     ) : (
                       <span className="text-xs text-gray-400">PDF N/A</span>
@@ -404,22 +386,22 @@ export default function PlanetPage({ planetName }) {
         </div>
 
         {totalPages > 1 && (
-          <div className="mt-6 bg-white rounded-lg p-4 shadow-sm flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Page {page} of {totalPages} — {totalText} results
+          <div className="mt-4 sm:mt-6 bg-white rounded-lg p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
+              Page {page} of {totalPages} – {totalText} results
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => gotoPage(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="px-3 py-1 border rounded"
+                className="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Prev
               </button>
               <button
                 onClick={() => gotoPage(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1 border rounded"
+                className="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

@@ -2,7 +2,7 @@
 
 import json
 import os
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query , UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from collections import Counter
@@ -448,7 +448,38 @@ def get_pdf_info(pmcid: str):
         "pdf_error": publication.get("pdf_error") if not publication.get("pdf_downloaded") else None
     }
 
-
+@app.post("/upload-temp-pdf")
+async def upload_temp_pdf(file: UploadFile = File(...)):
+    """
+    Upload a PDF file temporarily to the server and return the server path.
+    This endpoint is used by the frontend to upload PDF files before 
+    switching the chatbot to PDF mode.
+    """
+    try:
+        # Create uploads directory if it doesn't exist
+        upload_dir = Path("uploads")
+        upload_dir.mkdir(exist_ok=True)
+        
+        # Generate a unique filename to avoid conflicts
+        import uuid
+        file_extension = ".pdf"
+        if file.filename and file.filename.endswith('.pdf'):
+            file_extension = ".pdf"
+        
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = upload_dir / unique_filename
+        
+        # Save the uploaded file
+        with open(file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        # Return the server path (relative to the backend directory)
+        server_path = str(file_path)
+        return {"path": server_path, "filename": unique_filename}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
 
 
 

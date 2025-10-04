@@ -45,6 +45,7 @@ backend/venv.bak/
 # === Backend specific ===
 backend/logs/
 backend/temp/
+backend/uploads/
 backend/.mypy_cache/
 backend/.pytest_cache/
 backend/.coverage

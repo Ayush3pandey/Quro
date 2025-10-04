@@ -64,7 +64,7 @@ const Header = () => {
       <div className="relative z-10 flex flex-col justify-center h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            NASA BioScience Explorer
+            THE QURO
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-200 leading-relaxed max-w-2xl">
             Scientific Research Analytics Platform - Explore cutting-edge research and discoveries from NASA's bioscience programs
