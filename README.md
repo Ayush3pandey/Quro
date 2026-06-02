@@ -15,17 +15,38 @@
 
 ## 📸 Screenshots & Visuals
 
+### Interactive Knowledge Graph
+*Explore research themes, complex relationships, and interconnected scientific nodes interactively.*
 <div align="center">
-  <img src="docs/assets/dashboard_graph.jpg" alt="Dashboard View" width="800" />
-  <br />
-  <img src="docs/assets/qurobot_chat.jpg" alt="QuroBot Interface" width="395" />
-  <img src="docs/assets/publications_list.jpg" alt="Publications List" width="395" />
+  <img src="docs/assets/dashboard_graph.jpg" alt="Interactive Knowledge Graph" width="800" />
 </div>
 
-### 🏗️ Architecture Diagrams
+### QuroBot - AI Research Assistant
+*Dual-mode assistant featuring a semantic RAG database and dynamic PDF analysis.*
 <div align="center">
-  <img src="docs/assets/data_pipeline.jpg" alt="Data Pipeline" width="395" />
-  <img src="docs/assets/query_architecture.jpg" alt="Query Architecture" width="395" />
+  <img src="docs/assets/qurobot_chat.jpg" alt="QuroBot Interface" width="800" />
+</div>
+
+### Publications Dashboard
+*Vast repository of 500+ heavily structured NASA Bioscience research papers with advanced filtering.*
+<div align="center">
+  <img src="docs/assets/publications_list.jpg" alt="Publications List" width="800" />
+</div>
+
+---
+
+## 🏗️ Architecture Diagrams
+
+### Data Ingestion & Processing Pipeline
+*Automated pipeline for PMC ingestion, OCR, extraction, intelligent chunking, vectorization, and Knowledge Graph construction.*
+<div align="center">
+  <img src="docs/assets/data_pipeline.jpg" alt="Data Pipeline" width="800" />
+</div>
+
+### Semantic Query & Retrieval Architecture
+*End-to-end user query flow utilizing semantic encoders, graph traversal, and LLM inference for highly accurate responses.*
+<div align="center">
+  <img src="docs/assets/query_architecture.jpg" alt="Query Architecture" width="800" />
 </div>
 
 ---
