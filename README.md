@@ -22,7 +22,7 @@
 </div>
 
 ### QuroBot - AI Research Assistant
-*Dual-mode assistant featuring a semantic RAG database and dynamic PDF analysis.*
+*Intelligent assistant utilizing GraphRAG (Graph + RAG) for deep BFS-based semantic analysis, providing highly accurate answers with precise internal and external source citations.*
 <div align="center">
   <img src="docs/assets/qurobot_chat.jpg" alt="QuroBot Interface" width="800" />
 </div>
@@ -56,8 +56,9 @@
 Quro integrates multiple AI-driven components to deliver a complete end-to-end research experience.
 
 ### 🤖 AI-Powered Research Assistant (QuroBot)
-- **Dual Modes:** Features a massive RAG database for semantic search across 500+ publications, and a dynamic PDF analyzer to upload and query any local research papers.
-- **Engine:** Powered by **Google Gemini**, **Qdrant**, and **Sentence Transformers**.
+- **GraphRAG Analysis:** Utilizes a powerful combination of Knowledge Graphs and RAG (GraphRAG) to perform detailed BFS-based and deep semantic analysis for answering complex research queries.
+- **Intelligent Citations:** Automatically cites the specific internal PDFs (from the 500+ corpus) used to generate the answer. If the information is not found internally, it dynamically pulls and cites from external web sources (or gracefully uses a combination of both).
+- **Engine:** Powered by **Google Gemini**, **Qdrant**, **Neo4j**, and **Sentence Transformers**.
 
 ### 🕸️ Interactive Knowledge Graph
 - **Engineered with Neo4j Aura**: Visually map and explore interactive research themes, complex relationships, and interconnected scientific nodes.
